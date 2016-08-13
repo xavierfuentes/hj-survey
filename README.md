@@ -40,3 +40,13 @@ Technologies used to do this:
 
 2. An admin page which displays a list of survey responses. This page should contain a simple table which contains the survey responses. Requirements:
   - The table column headers should contain the field names - 8 in total since the survey contains a total of 8 fields (2 fields per step).
+
+### Requirements
+
+NodeJS >=6
+
+### Getting started
+```
+git clone https://github.com/xavifuefer/hj-survey.git
+cd hj-survey
+npm install

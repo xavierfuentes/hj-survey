@@ -1,0 +1,23 @@
+{
+  "name": "hj-survey",
+  "version": "0.0.1",
+  "description": "The objective is to set up a simple HTML/CSS multi-step survey pop-up which sends responses back to a database and updates a survey responses admin page.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xavifuefer/hj-survey.git"
+  },
+  "author": "Xavi Fuentes <xavifuefer@gmail.com> (https://github.com/xavifuefer)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xavifuefer/hj-survey/issues"
+  },
+  "homepage": "https://github.com/xavifuefer/hj-survey#readme",
+  "devDependencies": {
+    "eslint": "^3.3.0",
+    "eslint-config-airbnb": "^10.0.1"
+  }
+}
