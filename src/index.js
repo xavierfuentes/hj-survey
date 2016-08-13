@@ -1,3 +1,13 @@
-const greet = 'world';
+import Survey from './Survey';
 
-console.log(`Hello ${greet}`);
+const settings = {
+  delay: 0,
+};
+
+const timeoutID = window.setTimeout(showSurvey, settings.delay);
+
+function showSurvey() {
+  const survey = new Survey();
+
+  survey.show();
+}

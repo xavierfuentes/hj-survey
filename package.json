@@ -32,10 +32,10 @@
     "eslint-plugin-import": "^1.13.0",
     "eslint-plugin-jsx-a11y": "^2.1.0",
     "eslint-plugin-react": "^6.0.0",
+    "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.22.0",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }

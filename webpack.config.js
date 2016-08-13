@@ -1,30 +1,31 @@
+const path = require('path');
 const webpack = require('webpack');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
+  devtool: 'inline-source-map',
   entry: [
     'webpack-dev-server/client?http://localhost:8080',
     'webpack/hot/only-dev-server',
-    './src/index.js',
+    path.resolve(__dirname, 'src/index.js'),
   ],
   module: {
-    loaders: [{
-      test: /\.js?$/,
-      exclude: /node_modules/,
-      loader: 'babel',
-    }],
+    loaders: [
+      { test: /\.js?$/, exclude: /node_modules/, loader: 'babel' },
+      { test: /\.html?$/, loader: 'html' },
+    ],
   },
   resolve: {
     extensions: ['', '.js'],
   },
   output: {
-    path: 'dist',
+    path: path.join(__dirname, 'dist'),
     publicPath: '/',
     filename: 'bundle.js',
   },
   devServer: {
-    contentBase: './dist',
+    contentBase: path.join(__dirname, 'dist'),
     hot: true,
   },
   plugins: [

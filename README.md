@@ -50,3 +50,4 @@ NodeJS >=6
 git clone https://github.com/xavifuefer/hj-survey.git
 cd hj-survey
 npm install
+```
