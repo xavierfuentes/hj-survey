@@ -6,13 +6,8 @@ const _templates = {
   dialog: '<div id="survey-dialog"></div>',
   content: '<div id="survey-content"></div>',
   header: '<div id="survey-header"></div>',
-  step: '<div id="survey-step"></div>',
+  body: '<div id="survey-body"></div>',
   footer: '<div id="survey-footer"></div>',
-};
-const _initialState = {
-  initialStep: 1,
-  activeStep: 1,
-  maxStep: 4,
 };
 
 /**
@@ -33,17 +28,18 @@ function buildNode(content) {
 class Survey {
   constructor() {
     this.id = uuid.v4();
-    this.state = Object.assign({}, _initialState);
+    this.element = null;
 
-    this._html = {};
     this._templates = Object.assign({}, _templates);
+    this._html = {};
+    this._handlers = {};
 
-    this._render();
+    this._render()._setEvents()._setStep(1);
   }
 
   show() {
     const html = this._html;
-    console.log(html);
+
     document.body.appendChild(html.container);
   }
 
@@ -55,15 +51,17 @@ class Survey {
     html.dialog = buildNode(tpls.dialog);
     html.content = buildNode(tpls.content);
     html.header = buildNode(tpls.header);
-    html.step = buildNode(tpls.step);
+    html.body = buildNode(tpls.body);
     html.footer = buildNode(tpls.footer);
 
     // sets a unique id for the container
     html.container.id = this.id;
 
     this._renderHeader();
-    this._renderSteps();
+    this._renderBody();
     this._renderFooter();
+
+    this.element = html.container;
 
     html.dialog.appendChild(html.content);
     html.container.appendChild(html.dialog);
@@ -78,26 +76,41 @@ class Survey {
     html.content.appendChild(html.header);
   }
 
-  _renderSteps() {
+  _renderBody() {
     const html = this._html;
 
-    html.step.innerHTML = `
-      <div id="survey-step-1">step #1</div>
-      <div id="survey-step-2">step #2</div>
-      <div id="survey-step-3">step #3</div>
-      <div id="survey-step-4">step #4</div>
-    `;
-    html.content.appendChild(html.step);
+    html.content.appendChild(html.body);
   }
 
   _renderFooter() {
     const html = this._html;
 
     html.footer.innerHTML = `
-      <button>Previous</button>
-      <button>Next</button>
+      <button data-action="previous-step">Previous</button>
+      <button data-action="next-step">Next</button>
     `;
     html.content.appendChild(html.footer);
+  }
+
+  _setStep(step = 1) {
+    const body = this.element.querySelector('#survey-body');
+
+    body.innerHTML = `<p>step #${step}</p>`;
+  }
+
+  _setEvents() {
+    const html = this._html;
+
+    this._handlers.clickHandler = e => this._handleClickEvent(e);
+    html.container.addEventListener('click', this._handlers.clickHandler);
+
+    return this;
+  }
+
+  _handleClickEvent(e) {
+    console.log(e.target.getAttribute('data-action'));
+
+    return true;
   }
 }
 
