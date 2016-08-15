@@ -1,6 +1,10 @@
 import uuid from 'uuid';
+import { createStore } from 'redux';
 
 const _factory = document.createElement('div');
+const _initialState = {
+  currentStep: 1,
+};
 const _templates = {
   container: '<div></div>',
   dialog: '<div id="survey-dialog"></div>',
@@ -9,6 +13,20 @@ const _templates = {
   body: '<div id="survey-body"></div>',
   footer: '<div id="survey-footer"></div>',
 };
+const store = createStore((state = _initialState, action) => {
+  switch (action.type) {
+    case 'next-step':
+      return Object.assign({}, state, {
+        currentStep: state.currentStep + 1,
+      });
+    case 'previous-step':
+      return Object.assign({}, state, {
+        currentStep: state.currentStep - 1,
+      });
+    default:
+      return state;
+  }
+});
 
 /**
  * Builds an HTML node from a string
@@ -34,7 +52,11 @@ class Survey {
     this._html = {};
     this._handlers = {};
 
-    this._render()._setEvents()._setStep(1);
+    this._render();
+    this._setEvents();
+    this._setStep();
+
+    store.subscribe(this._setStep.bind(this));
   }
 
   show() {
@@ -92,10 +114,11 @@ class Survey {
     html.content.appendChild(html.footer);
   }
 
-  _setStep(step = 1) {
+  _setStep() {
     const body = this.element.querySelector('#survey-body');
+    const currentStep = store.getState().currentStep;
 
-    body.innerHTML = `<p>step #${step}</p>`;
+    body.innerHTML = `<p>step #${currentStep}</p>`;
   }
 
   _setEvents() {
@@ -108,7 +131,8 @@ class Survey {
   }
 
   _handleClickEvent(e) {
-    console.log(e.target.getAttribute('data-action'));
+    const action = e.target.getAttribute('data-action');
+    store.dispatch({ type: action });
 
     return true;
   }

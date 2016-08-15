@@ -34,8 +34,11 @@
     "eslint-plugin-react": "^6.0.0",
     "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.22.0",
-    "uuid": "^2.0.2",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
+  },
+  "dependencies": {
+    "redux": "^3.5.2",
+    "uuid": "^2.0.2"
   }
 }
