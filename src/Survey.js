@@ -1,4 +1,4 @@
-import uuid from 'uuid';
+import { v4 } from 'uuid';
 import { createStore } from 'redux';
 
 const _factory = document.createElement('div');
@@ -45,7 +45,7 @@ function buildNode(content) {
  */
 class Survey {
   constructor() {
-    this.id = uuid.v4();
+    this.id = v4();
     this.element = null;
 
     this._templates = Object.assign({}, _templates);
