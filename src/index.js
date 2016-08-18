@@ -9,5 +9,5 @@ const timeoutID = window.setTimeout(showSurvey, settings.delay);
 function showSurvey() {
   const survey = new Survey();
 
-  survey.show();
+  survey.render();
 }

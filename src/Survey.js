@@ -1,140 +1,96 @@
-import { v4 } from 'uuid';
 import { createStore } from 'redux';
 
-const _factory = document.createElement('div');
-const _initialState = {
-  currentStep: 1,
+// initial state
+const initialState = {
+  step: 1,
 };
-const _templates = {
-  container: '<div></div>',
-  dialog: '<div id="survey-dialog"></div>',
-  content: '<div id="survey-content"></div>',
-  header: '<div id="survey-header"></div>',
-  body: '<div id="survey-body"></div>',
-  footer: '<div id="survey-footer"></div>',
-};
-const store = createStore((state = _initialState, action) => {
+
+// actions
+const setNextStep = () => { return { type: 'NEXT_STEP' }; };
+const setPrevStep = () => { return { type: 'PREVIOUS_STEP' }; };
+
+// reducer
+function survey(state = initialState, action) {
+  console.log('survey', action);
+
   switch (action.type) {
-    case 'next-step':
-      return Object.assign({}, state, {
-        currentStep: state.currentStep + 1,
-      });
-    case 'previous-step':
-      return Object.assign({}, state, {
-        currentStep: state.currentStep - 1,
-      });
+    case 'NEXT_STEP':
+      return Object.assign({}, state, { step: state.step + 1 });
+
+    case 'PREVIOUS_STEP':
+      return Object.assign({}, state, { step: state.step - 1 });
+
     default:
       return state;
   }
-});
-
-/**
- * Builds an HTML node from a string
- * @param  {String} content The HTML to render
- * @return {Object}         DOM node
- */
-function buildNode(content) {
-  _factory.innerHTML = '';
-  _factory.innerHTML = content;
-
-  return _factory.childNodes[0];
 }
 
-/**
- * @class Survey
- */
+// create store
+const store = createStore(survey);
+
 class Survey {
   constructor() {
-    this.id = v4();
-    this.element = null;
-
-    this._templates = Object.assign({}, _templates);
-    this._html = {};
-    this._handlers = {};
-
-    this._render();
-    this._setEvents();
-    this._setStep();
-
-    store.subscribe(this._setStep.bind(this));
-  }
-
-  show() {
-    const html = this._html;
-
-    document.body.appendChild(html.container);
-  }
-
-  _render() {
-    const html = this._html;
-    const tpls = this._templates;
-
-    html.container = buildNode(tpls.container);
-    html.dialog = buildNode(tpls.dialog);
-    html.content = buildNode(tpls.content);
-    html.header = buildNode(tpls.header);
-    html.body = buildNode(tpls.body);
-    html.footer = buildNode(tpls.footer);
-
-    // sets a unique id for the container
-    html.container.id = this.id;
-
-    this._renderHeader();
-    this._renderBody();
-    this._renderFooter();
-
-    this.element = html.container;
-
-    html.dialog.appendChild(html.content);
-    html.container.appendChild(html.dialog);
-
-    return this;
-  }
-
-  _renderHeader() {
-    const html = this._html;
-
-    html.header.innerHTML = '<div id="survey-title">One fine survey</div>';
-    html.content.appendChild(html.header);
-  }
-
-  _renderBody() {
-    const html = this._html;
-
-    html.content.appendChild(html.body);
-  }
-
-  _renderFooter() {
-    const html = this._html;
-
-    html.footer.innerHTML = `
-      <button data-action="previous-step">Previous</button>
-      <button data-action="next-step">Next</button>
+    this.template = `
+      <div id="survey">
+        <div id="survey-dialog">
+          <div id="survey-header">
+            <h1 id="survey-title">One fine survey</h1>
+          </div>
+          <div id="survey-body"></div>
+          <div id="survey-footer">
+            <button data-action="prev-step">Previous</button>
+            <button data-action="next-step">Next</button>
+          </div>
+        </div>
+      </div>
     `;
-    html.content.appendChild(html.footer);
+    this.$el = this.build(this.template);
+
+    store.subscribe(this.update.bind(this));
   }
 
-  _setStep() {
-    const body = this.element.querySelector('#survey-body');
-    const currentStep = store.getState().currentStep;
+  build(content) {
+    const _f = document.createElement('div');
 
-    body.innerHTML = `<p>step #${currentStep}</p>`;
+    _f.innerHTML = content;
+
+    return _f;
   }
 
-  _setEvents() {
-    const html = this._html;
+  render() {
+    this.$el.addEventListener('click', this.handleClick.bind(this));
 
-    this._handlers.clickHandler = e => this._handleClickEvent(e);
-    html.container.addEventListener('click', this._handlers.clickHandler);
+    this.update();
 
-    return this;
+    document.body.appendChild(this.$el);
   }
 
-  _handleClickEvent(e) {
+  update() {
+    const state = store.getState();
+    const $title = this.$el.querySelector('#survey-title');
+    const $step = this.$el.querySelector('#survey-body');
+    const $prevButton = this.$el.querySelector('[data-action="prev-step"]');
+    const $nextButton = this.$el.querySelector('[data-action="next-step"]');
+
+    this.$el.querySelector('#survey-body').innerHTML = state.step;
+  }
+
+  handleClick(e) {
     const action = e.target.getAttribute('data-action');
-    store.dispatch({ type: action });
 
-    return true;
+    switch (action) {
+      case 'prev-step': this.prevStep(); break;
+      case 'next-step': this.nextStep(); break;
+      default: throw new Error(`There is no action defined as ${action}`);
+    }
+  }
+
+  nextStep() {
+    store.dispatch(setNextStep());
+  }
+
+  prevStep() {
+    store.dispatch(setPrevStep());
   }
 }
 
