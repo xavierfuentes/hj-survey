@@ -3,6 +3,7 @@ import { createStore } from 'redux';
 // initial state
 const initialState = {
   step: 1,
+  totalSteps: 5,
 };
 
 // actions
@@ -15,10 +16,14 @@ function survey(state = initialState, action) {
 
   switch (action.type) {
     case 'NEXT_STEP':
-      return Object.assign({}, state, { step: state.step + 1 });
+      return Object.assign({}, state, {
+        step: state.step + 1,
+      });
 
     case 'PREVIOUS_STEP':
-      return Object.assign({}, state, { step: state.step - 1 });
+      return Object.assign({}, state, {
+        step: state.step - 1,
+      });
 
     default:
       return state;
@@ -57,6 +62,10 @@ class Survey {
     return _f;
   }
 
+  buildStep(step) {
+
+  }
+
   render() {
     this.$el.addEventListener('click', this.handleClick.bind(this));
 
@@ -72,7 +81,15 @@ class Survey {
     const $prevButton = this.$el.querySelector('[data-action="prev-step"]');
     const $nextButton = this.$el.querySelector('[data-action="next-step"]');
 
-    this.$el.querySelector('#survey-body').innerHTML = state.step;
+    // update header
+    // $title.innerHTML = `Step #${state.step}`;
+
+    // update step
+    $step.innerHTML = state.step;
+
+    // update footer
+    $prevButton.disabled = state.step === 1;
+    $nextButton.disabled = state.step === state.totalSteps;
   }
 
   handleClick(e) {
@@ -81,16 +98,21 @@ class Survey {
     switch (action) {
       case 'prev-step': this.prevStep(); break;
       case 'next-step': this.nextStep(); break;
-      default: throw new Error(`There is no action defined as ${action}`);
+      default: throw new Error(`There is no action type such as ${action}`);
     }
   }
 
   nextStep() {
-    store.dispatch(setNextStep());
+    const currentStep = store.getState().step;
+    const lastStep = store.getState().totalSteps;
+
+    if (currentStep < lastStep) store.dispatch(setNextStep());
   }
 
   prevStep() {
-    store.dispatch(setPrevStep());
+    const currentStep = store.getState().step;
+
+    if (currentStep > 1) store.dispatch(setPrevStep());
   }
 }
 
