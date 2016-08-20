@@ -4,26 +4,58 @@ import { createStore } from 'redux';
 const initialState = {
   step: 1,
   totalSteps: 5,
+  shouldRender: true,
+  isValid: false,
+  steps: {
+    step1: {
+      name: { value: '', isValid: false },
+      email: { value: '', isValid: false },
+      type: { value: '', isValid: false },
+    },
+  },
 };
 
 // actions
-const setNextStep = () => { return { type: 'NEXT_STEP' }; };
-const setPrevStep = () => { return { type: 'PREVIOUS_STEP' }; };
+const setNextStep = () => ({ type: 'NEXT_STEP' });
+const setPrevStep = () => ({ type: 'PREVIOUS_STEP' });
+const validateForm = (payload) => ({ type: 'VALIDATE_FORM', payload });
 
 // reducer
 function survey(state = initialState, action) {
   console.log('survey', action);
 
   switch (action.type) {
-    case 'NEXT_STEP':
-      return Object.assign({}, state, {
-        step: state.step + 1,
-      });
+    case 'NEXT_STEP': {
+      // add a special condition in which we skip a step
+      const increment = state.step === 1 && state.steps.step1.type.value === '' ? 1 : 2;
 
-    case 'PREVIOUS_STEP':
       return Object.assign({}, state, {
-        step: state.step - 1,
+        step: state.step + increment,
+        shouldRender: true,
+        isValid: false,
       });
+    }
+
+    case 'PREVIOUS_STEP': return Object.assign({}, state, { step: state.step - 1 });
+
+    case 'VALIDATE_FORM': {
+      const newState = Object.assign({}, state);
+      const formStep = state.steps[`step${state.step}`];
+      let stepScore = 0;
+
+      // assign the value to its model
+      newState.steps[`step${state.step}`][action.payload.field].value = action.payload.value;
+      newState.steps[`step${state.step}`][action.payload.field].isValid = action.payload.isValid;
+
+      stepScore = Object.keys(formStep)
+        .map(field => formStep[field].isValid)
+        .reduce((score = 0, value) => score + value);
+      newState.isValid = stepScore === Object.keys(formStep);
+
+      newState.shouldRender = false;
+
+      return newState;
+    }
 
     default:
       return state;
@@ -38,14 +70,16 @@ class Survey {
     this.template = `
       <div id="survey">
         <div id="survey-dialog">
-          <div id="survey-header">
-            <h1 id="survey-title">One fine survey</h1>
-          </div>
-          <div id="survey-body"></div>
-          <div id="survey-footer">
-            <button data-action="prev-step">Previous</button>
-            <button data-action="next-step">Next</button>
-          </div>
+          <form name="survey-form">
+            <div id="survey-header">
+              <h1 id="survey-title">One fine survey</h1>
+            </div>
+            <div id="survey-body"></div>
+            <div id="survey-footer">
+              <button data-action="prev-step">Previous</button>
+              <button data-action="next-step" type="submit">Next</button>
+            </div>
+          </form>
         </div>
       </div>
     `;
@@ -62,57 +96,74 @@ class Survey {
     return _f;
   }
 
-  buildStep(step) {
-
-  }
-
   render() {
     this.$el.addEventListener('click', this.handleClick.bind(this));
+    this.$el.addEventListener('change', this.handleChange.bind(this));
+    this.$el.addEventListener('keyup', this.handleChange.bind(this));
 
     this.update();
 
     document.body.appendChild(this.$el);
+
+    return this;
   }
 
   update() {
     const state = store.getState();
-    const $title = this.$el.querySelector('#survey-title');
     const $step = this.$el.querySelector('#survey-body');
     const $prevButton = this.$el.querySelector('[data-action="prev-step"]');
     const $nextButton = this.$el.querySelector('[data-action="next-step"]');
-
-    // update header
-    // $title.innerHTML = `Step #${state.step}`;
+    const stepTemplates = {
+      1: `
+        <input name="name" type="text" placeholder="Name" required
+          value="${state.steps.step1.name.value}">
+        <input name="email" type="email" placeholder="Email" required
+          value="${state.steps.step1.email.value}">
+        <select name="type" required>
+          <option value="" selected disabled>Select an option</option>
+          <option value="business"
+            ${state.steps.step1.type.value === 'business' && 'selected'}>Business</option>
+          <option value="individual"
+            ${state.steps.step1.type.value === 'individual' && 'selected'}>Individual</option>
+        </select>
+      `,
+      2: 'step 2',
+      3: 'step 3',
+      4: 'step 4',
+      5: 'step 5',
+    };
 
     // update step
-    $step.innerHTML = state.step;
+    if (state.shouldRender) $step.innerHTML = stepTemplates[state.step];
 
     // update footer
-    $prevButton.disabled = state.step === 1;
-    $nextButton.disabled = state.step === state.totalSteps;
+    $prevButton.style.display = state.step === 1 ? 'none' : '';
+    $nextButton.style.display = state.step === state.totalSteps ? 'none' : '';
   }
 
   handleClick(e) {
-    const action = e.target.getAttribute('data-action');
+    e.preventDefault();
 
-    switch (action) {
-      case 'prev-step': this.prevStep(); break;
-      case 'next-step': this.nextStep(); break;
-      default: throw new Error(`There is no action type such as ${action}`);
+    switch (e.target.getAttribute('data-action')) {
+      case 'prev-step': {
+        store.dispatch(setPrevStep());
+        break;
+      }
+      case 'next-step': store.dispatch(setNextStep()); break;
+      default: return true;
     }
+
+    return this;
   }
 
-  nextStep() {
-    const currentStep = store.getState().step;
-    const lastStep = store.getState().totalSteps;
+  handleChange(e) {
+    e.preventDefault();
 
-    if (currentStep < lastStep) store.dispatch(setNextStep());
-  }
-
-  prevStep() {
-    const currentStep = store.getState().step;
-
-    if (currentStep > 1) store.dispatch(setPrevStep());
+    store.dispatch(validateForm({
+      field: e.target.name,
+      value: e.target.value,
+      isValid: e.target.validity.valid,
+    }));
   }
 }
 
