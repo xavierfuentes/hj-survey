@@ -4,7 +4,9 @@
   "description": "The objective is to set up a simple HTML/CSS multi-step survey pop-up which sends responses back to a database and updates a survey responses admin page.",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server",
+    "dev": "npm run dev:server; npm run dev:app && exit 1;",
+    "dev:server": "nodemon server/index.js --exec babel-node",
+    "dev:client": "webpack-dev-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -22,7 +24,8 @@
       "es2015"
     ]
   },
-  "devDependencies": {
+  "dependencies": {
+    "babel-cli": "^6.11.4",
     "babel-core": "^6.13.2",
     "babel-eslint": "^6.1.2",
     "babel-loader": "^6.2.4",
@@ -32,13 +35,15 @@
     "eslint-plugin-import": "^1.13.0",
     "eslint-plugin-jsx-a11y": "^2.1.0",
     "eslint-plugin-react": "^6.0.0",
+    "express": "^4.14.0",
     "html-loader": "^0.4.3",
     "html-webpack-plugin": "^2.22.0",
+    "mongoose": "^4.5.9",
+    "morgan": "^1.7.0",
+    "nodemon": "^1.10.2",
+    "redux": "^3.5.2",
+    "uuid": "^2.0.2",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
-  },
-  "dependencies": {
-    "redux": "^3.5.2",
-    "uuid": "^2.0.2"
   }
 }
