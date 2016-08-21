@@ -8,7 +8,7 @@ module.exports = {
   entry: [
     'webpack-dev-server/client?http://localhost:8080',
     'webpack/hot/only-dev-server',
-    path.resolve(__dirname, 'src/index.js'),
+    path.resolve(__dirname, 'app/index.js'),
   ],
   module: {
     loaders: [
@@ -30,6 +30,10 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: 'app/index.html',
+      inject: 'body',
+      hash: true,
+    }),
   ],
 };
