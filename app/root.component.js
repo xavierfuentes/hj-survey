@@ -1,8 +1,9 @@
 const rootComponent = {
   template: `
-  <div class="hj-admin">
-    <span>hello!</span>
-  </div>
+    <div class="hj-admin">
+      <h1>Surveys</h1>
+      <survey-container></survey-container>
+    </div>
   `,
 };
 
