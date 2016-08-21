@@ -1,120 +1,7 @@
-import { createStore } from 'redux';
-
-// initial state
-const initialState = {
-  step: 1,
-  shouldRender: true,
-  steps: {
-    1: {
-      id: 1,
-      title: 'Personal Details',
-      isValid: false,
-      fields: {
-        name: { required: true, value: '' },
-        email: { required: true, value: '' },
-        type: { required: true, value: '' },
-      },
-    },
-    2: {
-      id: 2,
-      title: 'Business Details',
-      isValid: false,
-      fields: {
-        'business.name': { required: true, value: '' },
-        'business.size': { required: true, value: '' },
-      },
-    },
-    3: {
-      id: 3,
-      title: 'Location Details',
-      isValid: false,
-      fields: {
-        address: { required: true, value: '' },
-        euresident: { required: true, value: null },
-      },
-    },
-    4: {
-      id: 4,
-      title: 'Hobbies',
-      isValid: false,
-      fields: {
-        book: { required: false, value: '' },
-        'colors.red': { required: false, value: null },
-        'colors.green': { required: false, value: null },
-        'colors.blue': { required: false, value: null },
-      },
-    },
-    5: {
-      id: 5,
-      title: 'You made it!',
-    },
-  },
-};
-
-// actions
-const setNextStep = () => ({ type: 'NEXT_STEP' });
-const setPrevStep = () => ({ type: 'PREVIOUS_STEP' });
-const validateForm = (payload) => ({ type: 'VALIDATE_FORM', payload });
-
-// reducer
-function survey(state = initialState, action) {
-  console.log('action dispatched ->', action);
-
-  switch (action.type) {
-    case 'NEXT_STEP': {
-      // Special condition for skipping step 2 and going straight to step 3
-      const increment = state.step === 1 && state.steps[1].fields.type.value === 'individual' ? 2 : 1;
-
-      return Object.assign({}, state, {
-        step: state.steps[state.step].isValid ? state.step + increment : state.step,
-        shouldRender: true,
-      });
-    }
-
-    case 'PREVIOUS_STEP': {
-      // Special condition for skipping step 2 and going straight to step 1
-      const decrement = state.step === 3 && state.steps[1].fields.type.value === 'individual' ? 2 : 1;
-
-      return Object.assign({}, state, {
-        step: state.step - decrement,
-        shouldRender: true,
-      });
-    }
-
-    case 'VALIDATE_FORM': {
-      const newState = Object.assign({}, state);
-      const stepFields = state.steps[state.step].fields;
-      let stepScore = 0;
-      let neededScore = 0;
-
-      // assign the value to its model
-      newState.steps[state.step].fields[action.payload.field].value = action.payload.value;
-      newState.steps[state.step].fields[action.payload.field].isValid = action.payload.isValid;
-
-      stepScore = Object.keys(stepFields)
-        .map(field => stepFields[field].isValid || false)
-        .reduce((score = 0, value) => score + value);
-
-      neededScore = Object.keys(stepFields)
-        .filter(field => stepFields[field].required).length;
-
-      newState.steps[state.step].isValid = stepScore >= neededScore;
-
-      newState.shouldRender = false;
-
-      return newState;
-    }
-
-    default:
-      return state;
-  }
-}
-
-// create store
-const store = createStore(survey);
+import * as surveyACtions from './reducer';
 
 class Survey {
-  constructor() {
+  constructor(store) {
     this.template = `
       <div id="survey">
         <div id="survey-dialog">
@@ -130,9 +17,10 @@ class Survey {
           </form>
         </div>
       </div>`;
+    this.store = store;
     this.$el = this.build(this.template);
 
-    store.subscribe(this.update.bind(this));
+    this.store.subscribe(this.update.bind(this));
   }
 
   build(content) {
@@ -156,7 +44,7 @@ class Survey {
   }
 
   update() {
-    const state = store.getState();
+    const state = this.store.getState();
     const $title = this.$el.querySelector('#survey-title');
     const $step = this.$el.querySelector('#survey-body');
     const $prevButton = this.$el.querySelector('[data-action="prev-step"]');
@@ -164,19 +52,19 @@ class Survey {
     const stepTemplates = {
       1: `
         <div class="input-container">
-          <label>Name:</label>
-          <input name="name" type="text" placeholder="Name" required
+          <label>Your Name</label>
+          <input name="name" type="text" placeholder="First and Last" required autofocus
             value="${state.steps[1].fields.name.value}">
         </div>
         <div class="input-container">
-          <label>Email:</label>
-          <input name="email" type="email" placeholder="Email" required
+          <label>Email Address</label>
+          <input name="email" type="email" placeholder="example@domain.com" required
             value="${state.steps[1].fields.email.value}">
         </div>
         <div class="input-container">
-          <label>Type:</label>
+          <label>User Type</label>
           <select name="type" required>
-            <option value="" selected disabled>Select an option</option>
+            <option value="" selected disabled>Select One</option>
             <option value="business"
               ${state.steps[1].fields.type.value === 'business' && 'selected'}>Business</option>
             <option value="individual"
@@ -185,14 +73,14 @@ class Survey {
         </div>`,
       2: `
         <div class="input-container">
-          <label>Business name:</label>
-          <input name="business.name" type="text" placeholder="Business name" required
+          <label>Business Name:</label>
+          <input name="business.name" type="text" required autofocus
             value="${state.steps[2].fields['business.name'].value}">
         </div>
         <div class="input-container">
-          <label>Number of employees:</label>
+          <label>Number of Employees:</label>
           <select name="business.size" required>
-            <option value="" selected disabled>Select a business size</option>
+            <option value="" selected disabled>Select One</option>
             <option value="1-10"
               ${state.steps[2].fields['business.size'].value === '1-10' && 'selected'}>1-10</option>
             <option value="11-25"
@@ -208,7 +96,7 @@ class Survey {
       3: `
         <div class="input-container">
           <label>Address:</label>
-          <input name="address" type="text" placeholder="Address" required
+          <input name="address" type="text" placeholder="Building Number, Street, City, County/State, Country" required autofocus
             value="${state.steps[3].fields.address.value}">
         </div>
         <div class="input-container">
@@ -226,12 +114,12 @@ class Survey {
         </div>`,
       4: `
         <div class="input-container">
-          <label>Favourite book:</label>
-          <input name="book" type="text" placeholder="Type the name of the book"
+          <label>Favourite Book:</label>
+          <input name="book" type="text" autofocus required
             value="${state.steps[4].fields.book.value}">
         </div>
         <div class="input-container">
-          <span>Favourite colors:</span>
+          <span>Favourite Colors (Tick all that apply):</span>
           <label>
             <input type="checkbox" value="red" name="colors.red"
               ${state.steps[4].fields['colors.red'].value === 'red' ? 'checked' : ''}>
@@ -269,18 +157,14 @@ class Survey {
 
   handleClick(e) {
     switch (e.target.getAttribute('data-action')) {
-      case 'prev-step': store.dispatch(setPrevStep()); break;
-      case 'next-step': store.dispatch(setNextStep()); break;
+      case 'prev-step': this.store.dispatch(surveyACtions.setPrevStep()); break;
+      case 'next-step': this.store.dispatch(surveyACtions.setNextStep()); break;
       default: return true;
     }
-
-    return true;
   }
 
   handleChange(e) {
-    // save the form in LS
-
-    store.dispatch(validateForm({
+    this.store.dispatch(surveyACtions.validateForm({
       field: e.target.name,
       value: e.target.value,
       isValid: e.target.validity.valid,
