@@ -1,10 +1,11 @@
 import controller from './survey-element.controller';
 
 const surveyListComponent = {
+  bindings: {
+    surveyData: '<surveyData',
+  },
   template: `
-    <div>
-      {{survey.id}}
-    </div>
+    <pre>{{survey|json}}</pre>
   `,
   controller,
 };
