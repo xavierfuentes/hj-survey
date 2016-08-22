@@ -18,6 +18,14 @@ mongoose.connection.on('error', () => {
 app.set('port', process.env.PORT || 5000);
 app.use(logger('dev'));
 
+// CORS
+app.all('/*', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  res.header('Access-Control-Allow-Methods', 'GET, POST', 'PUT');
+  next();
+});
+
 // Routes
 app.get('/surveys', mainController.getAllSurveys);
 app.put('/surveys', mainController.postNewSurvey);

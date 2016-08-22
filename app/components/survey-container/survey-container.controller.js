@@ -1,13 +1,14 @@
 class SurveyContainer {
-  constructor($log) {
+  constructor($log, SurveyService) {
     this.$log = $log;
+    this.SurveyService = SurveyService;
   }
 
   $onInit() {
-    this.$log.debug('hey!');
+    this.surveys = this.SurveyService.getSurveys().then(surveys => surveys);
   }
 }
 
-SurveyContainer.$inject = ['$log'];
+SurveyContainer.$inject = ['$log', 'SurveyService'];
 
 export default SurveyContainer;

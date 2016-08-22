@@ -3,7 +3,7 @@ import controller from './survey-container.controller';
 const surveyContainerComponent = {
   template: `
     <div>
-      <survey-list></survey-list>
+      <survey-list surveys=""></survey-list>
     </div>
   `,
   controller,
