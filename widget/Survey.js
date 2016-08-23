@@ -131,13 +131,17 @@ class Survey {
         height: 2.777em;
         transition: all .3s ease-out;
       }
-      #survey-form-${this.id} > #survey-footer-${this.id} > button[data-action="next-step"]:hover,
-      #survey-form-${this.id} > #survey-footer-${this.id} > button[data-action="next-step"]:focus {
+      #survey-form-${this.id} > #survey-footer-${this.id} > button[data-action="next-step"]:hover {
         box-shadow: 0 .067em .467em .133em rgba(0, 0, 0, 0.3);
       }
       #survey-form-${this.id} > #survey-footer-${this.id} > button[data-action="prev-step"] {
         color: #f4364c;
         margin-top: 1em;
+      }
+      #survey-form-${this.id} > #survey-footer-${this.id} > img {
+        width: 60%;
+        margin-top: 6em;
+        opacity: .2;
       }`;
     this.store = store;
     this.$el = this.build('div', this.template, `survey-${this.id}`);
@@ -175,6 +179,7 @@ class Survey {
     const $step = this.$el.querySelector(`#survey-body-${this.id}`);
     const $prevButton = this.$el.querySelector('[data-action="prev-step"]');
     const $nextButton = this.$el.querySelector('[data-action="next-step"]');
+    const $footer = this.$el.querySelector(`#survey-footer-${this.id}`);
     const headerTexts = {
       1: { title: 'Personal Details', subtitle: 'Tell us about yourself' },
       2: { title: 'Business Details', subtitle: 'Tell us about your business' },
@@ -229,14 +234,14 @@ class Survey {
         <div class="input-container radio-container">
           <span>Residing in the EU</span>
           <label>
-            <input name="euresident" type="radio" value="1"
-              ${state.steps[3].fields.euresident.value === '1' && 'checked'}>
-            <span>Yes</span>
-          </label>
-          <label>
             <input name="euresident" type="radio" value="0"
               ${state.steps[3].fields.euresident.value === '0' && 'checked'}>
             <span>No</span>
+          </label>
+          <label>
+            <input name="euresident" type="radio" value="1"
+              ${state.steps[3].fields.euresident.value === '1' && 'checked'}>
+            <span>Yes</span>
           </label>
         </div>`,
       4: `
@@ -274,14 +279,14 @@ class Survey {
     if (state.shouldRender && state.step <= maxSteps) {
       $step.innerHTML = stepTemplates[state.step];
     }
+    if (state.step > maxSteps) $step.innerHTML = null;
 
     // update footer
     $prevButton.style.display = state.step === 1 ? 'none' : 'initial';
-    if (state.isFinished) {
-      $prevButton.style.display = 'none';
-      $nextButton.style.display = 'none';
-    }
     $nextButton.innerText = state.step === maxSteps ? 'Send Results' : 'Next step';
+    if (state.isFinished) {
+      $footer.innerHTML = '<img src="//davidpottrell.co.uk/blog/wp-content/uploads/2015/10/hotjar-XL.png">';
+    }
   }
 
   handleClick(e) {
