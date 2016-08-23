@@ -2,17 +2,18 @@
 const NEXT_STEP = 'SURVEY/NEXT_STEP';
 const PREVIOUS_STEP = 'SURVEY/PREVIOUS_STEP';
 const VALIDATE_FORM = 'SURVEY/VALIDATE_FORM';
+const SAVE_SURVEY = 'SURVEY/SAVE_SURVEY';
 
 // initial state
 export function getInitialState() {
   return {
+    id: null,
     step: 1,
     isFinished: false,
     shouldRender: true,
     steps: {
       1: {
         id: 1,
-        title: 'Personal Details',
         isValid: false,
         fields: {
           name: { required: true, value: '' },
@@ -22,7 +23,6 @@ export function getInitialState() {
       },
       2: {
         id: 2,
-        title: 'Business Details',
         isValid: false,
         fields: {
           'business.name': { required: true, value: '' },
@@ -31,7 +31,6 @@ export function getInitialState() {
       },
       3: {
         id: 3,
-        title: 'Location Details',
         isValid: false,
         fields: {
           address: { required: false, value: '' },
@@ -40,7 +39,6 @@ export function getInitialState() {
       },
       4: {
         id: 4,
-        title: 'Hobbies',
         isValid: false,
         fields: {
           book: { required: false, value: '' },
@@ -48,10 +46,6 @@ export function getInitialState() {
           'colors.green': { required: false, value: null },
           'colors.blue': { required: false, value: null },
         },
-      },
-      5: {
-        id: 5,
-        title: 'You made it!',
       },
     },
   };
@@ -106,6 +100,25 @@ export default function survey(state = getInitialState(), action) {
       return newState;
     }
 
+    case SAVE_SURVEY: {
+      const request = new XMLHttpRequest();
+
+      request.open('POST', 'http://localhost:5000/surveys');
+      request.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+      request.onreadystatechange = function () {
+        // request successful + data available
+        if (request.readyState === 4 && request.status === 200) {
+          console.log('we made it!');
+        }
+      };
+
+      request.send(JSON.stringify(action.payload.form));
+
+      return Object.assign({}, state, {
+        isFinished: true,
+      });
+    }
+
     default:
       return state;
   }
@@ -115,3 +128,4 @@ export default function survey(state = getInitialState(), action) {
 export function setNextStep() { return { type: NEXT_STEP }; }
 export function setPrevStep() { return { type: PREVIOUS_STEP }; }
 export function validateForm(payload) { return { type: VALIDATE_FORM, payload }; }
+export function saveSurvey(payload) { return { type: SAVE_SURVEY, payload }; }
