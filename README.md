@@ -43,8 +43,8 @@ Technologies used to do this:
 
 ### Requirements
 
-NodeJS >=6
-MongoDB (installed and running)
+- NodeJS >=6
+- MongoDB (installed and running)
 
 ### Getting started
 ```
@@ -59,4 +59,4 @@ npm run dev:server
 npm run dev:client
 ```
 
-Open `http://localhost:8080/customer.html` in your browser to see the fake user and `http://localhost:8080/` to see the admin app.
+Open [http://localhost:8080/customer.html](http://localhost:8080/customer.html) in your browser to see the fake user and [http://localhost:8080](http://localhost:8080) to see the admin app.
