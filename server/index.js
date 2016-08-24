@@ -1,6 +1,7 @@
 import express from 'express';
 import logger from 'morgan';
 import mongoose from 'mongoose';
+import bodyParser from 'body-parser';
 // import path from 'path';
 
 import mainController from './main.controller';
@@ -16,19 +17,20 @@ mongoose.connection.on('error', () => {
 
 // App config
 app.set('port', process.env.PORT || 5000);
+app.use(bodyParser.json());
 app.use(logger('dev'));
 
 // CORS
 app.all('/*', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
   res.header('Access-Control-Allow-Methods', 'GET, POST', 'PUT');
   next();
 });
 
 // Routes
 app.get('/surveys', mainController.getAllSurveys);
-app.put('/surveys', mainController.postNewSurvey);
+app.post('/surveys', mainController.postNewSurvey);
 
 // Start
 app.listen(app.get('port'), () => {

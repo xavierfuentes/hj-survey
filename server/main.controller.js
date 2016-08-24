@@ -11,7 +11,13 @@ const mainController = {
   },
 
   postNewSurvey: (req, res) => {
-    Survey.create({ answer: req.body.text, done: false });
+    const survey = req.body;
+
+    Survey.create(survey, (err, survey) => {
+      if (err) return res.send(err);
+
+      res.json(true);
+    });
   },
 };
 
