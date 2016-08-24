@@ -7,7 +7,6 @@ const SAVE_SURVEY = 'SURVEY/SAVE_SURVEY';
 // initial state
 export function getInitialState() {
   return {
-    id: null,
     step: 1,
     isFinished: false,
     shouldRender: true,

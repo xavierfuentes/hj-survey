@@ -1,9 +1,9 @@
-import { v4 } from 'uuid';
 import * as surveyACtions from './reducer';
 
 class Survey {
   constructor(store) {
-    this.id = store.getState().id || v4();
+    this.store = store;
+    this.id = this.guid();
     this.template = `
       <div id="survey-dialog-${this.id}">
         <form id="survey-form-${this.id}">
@@ -143,11 +143,19 @@ class Survey {
         margin-top: 6em;
         opacity: .5;
       }`;
-    this.store = store;
     this.$el = this.build('div', this.template, `survey-${this.id}`);
     this.$style = this.build('style', this.styleRules);
 
     this.store.subscribe(this.update.bind(this));
+  }
+
+  guid() {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
   }
 
   build(el, content = '', id = null) {
