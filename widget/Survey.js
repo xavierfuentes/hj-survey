@@ -343,6 +343,11 @@ class Survey {
 
     // update footer
     if (state.isCompleted) {
+      const timeoutID = window.setTimeout(() => {
+        this.$el.style.display = 'none';
+        clearTimeout(timeoutID);
+      }, 2000);
+
       // final step Hotjar logo and hide the buttons in the last "screen"
       $footer.innerHTML = '<img src="//davidpottrell.co.uk/blog/wp-content/uploads/2015/10/hotjar-XL.png">';
     } else {
