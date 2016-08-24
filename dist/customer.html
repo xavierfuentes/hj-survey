@@ -11,41 +11,17 @@
     <base href="/">
     <link rel="stylesheet" href="https://necolas.github.io/normalize.css/4.1.1/normalize.css">
     <style>
-      html, body {
+      html, body, iframe {
         width: 100%;
         height: 100%;
       }
-
-      html {
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-      }
-
-      *, *:before, *:after {
-        -webkit-box-sizing: inherit;
-        -moz-box-sizing: inherit;
-        box-sizing: inherit;
-      }
-
-      .main-container {
-        height: 100%;
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .main-content {
-        flex: 1;
-        text-align: center;
+      body {
+        overflow-y: hidden;
       }
     </style>
   </head>
   <body>
-    <div class="main-container">
-      <div class="main-content">One Fine Content</div>
-    </div>
+    <iframe src="https://www.hotjar.com/" frameborder="0"></iframe>
 
     <script>
       (function (x,a,v,i,e,r) {

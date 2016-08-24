@@ -19,11 +19,20 @@ class Survey {
             <button data-action="prev-step">Previous step</button>
           </div>
         </form>
-      </div>`;
+      </div>
+      <div id="survey-overlay-${this.id}"></div>`;
 
     // Global styles for the Survey (namespaced with the ID)
     this.styleRules = `
-      #survey-${this.id}, #survey-dialog-${this.id} {
+      #survey-${this.id} *,
+      #survey-${this.id} *:before,
+      #survey-${this.id} *:after {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+      }
+      #survey-${this.id},
+      #survey-dialog-${this.id} {
         margin: auto;
         position: absolute;
         top: 0; left: 0; bottom: 0; right: 0;
@@ -40,6 +49,7 @@ class Survey {
         text-align: center;
         box-shadow: 0 .067em .267em 0 rgba(0, 0, 0, 0.3);
         background-color: #ffffff;
+        z-index: 1;
       }
       #survey-form-${this.id} {
         width: 100%; height: 100%;
@@ -146,6 +156,13 @@ class Survey {
         width: 60%;
         margin-top: 6em;
         opacity: .5;
+      }
+      #survey-overlay-${this.id} {
+        position: absolute;
+        width: 100%; heigth: 100%;
+        top: 0; bottom: 0; left: 0; right: 0;
+        background: #ffffff;
+        opacity: .6;
       }`;
 
     // Container for all the survey
