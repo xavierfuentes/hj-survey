@@ -4,6 +4,8 @@ class Survey {
   constructor(store) {
     this.store = store;
     this.id = this.guid();
+
+    // Global template
     this.template = `
       <div id="survey-dialog-${this.id}">
         <form id="survey-form-${this.id}">
@@ -18,6 +20,8 @@ class Survey {
           </div>
         </form>
       </div>`;
+
+    // Global styles for the Survey (namespaced with the ID)
     this.styleRules = `
       #survey-${this.id}, #survey-dialog-${this.id} {
         margin: auto;
@@ -143,12 +147,20 @@ class Survey {
         margin-top: 6em;
         opacity: .5;
       }`;
+
+    // Container for all the survey
     this.$el = this.build('div', this.template, `survey-${this.id}`);
+    // Style tag that will be injected in the HEAD
     this.$style = this.build('style', this.styleRules);
 
+    // subscribe the method "update" to any change in the store
     this.store.subscribe(this.update.bind(this));
   }
 
+  /**
+   * Generates a random unique id
+   * @return String AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA
+   */
   guid() {
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
@@ -158,13 +170,27 @@ class Survey {
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
   }
 
+  /**
+   * Generates a DOM node
+   * @param el String Tag of the new node
+   * @param content String content of the new node
+   * @param id String optional. Id of the node
+   * @return the new DOM node
+   */
   build(el, content = '', id = null) {
     const _f = document.createElement(el);
     _f.innerHTML = content;
-    _f.id = id;
+    if (id) _f.id = id;
     return _f;
   }
 
+  /**
+   * Main public event:
+   * - Add listeners for all the events that must be tracked
+   * - Check if the Survey should be rendered (if it's not finished in LS)
+   * - Renders the step necessary
+   * - Appends the main Container to the body and the Style to the head
+   */
   render() {
     const state = this.store.getState();
     // sets the events up
@@ -183,6 +209,9 @@ class Survey {
     return this;
   }
 
+  /**
+   * Update the template based on the current state of the Survey
+   */
   update() {
     const state = this.store.getState();
     const $title = this.$el.querySelector(`#survey-title-${this.id}`);
@@ -280,36 +309,44 @@ class Survey {
         </div>
         `,
     };
-    const maxSteps = Object.keys(stepTemplates).length;
+
+    this.maxSteps = Object.keys(stepTemplates).length;
 
     // update title
     $title.innerHTML = headerTexts[state.step].title;
     $subtitle.innerHTML = headerTexts[state.step].subtitle;
 
     // update step
-    if (state.shouldRender && state.step <= maxSteps) {
+    if (state.shouldRender && state.step <= this.maxSteps) {
       $step.innerHTML = stepTemplates[state.step];
     }
-    if (state.step > maxSteps) {
+    if (state.step > this.maxSteps) {
       $step.innerHTML = null;
     }
 
     // update footer
     if (state.isCompleted) {
+      // final step Hotjar logo and hide the buttons in the last "screen"
       $footer.innerHTML = '<img src="//davidpottrell.co.uk/blog/wp-content/uploads/2015/10/hotjar-XL.png">';
     } else {
+      // hide the "previous step" in the first step
       $prevButton.style.display = state.step === 1 ? 'none' : 'initial';
-      $nextButton.innerText = state.step === maxSteps ? 'Send Results' : 'Next step';
+      // Change the copy of the button for the last step, before saving it.
+      $nextButton.innerText = state.step === this.maxSteps ? 'Send Results' : 'Next step';
     }
   }
 
   handleClick(e) {
     const state = this.store.getState();
 
+    // Use "event delegation" to check what element has received the event.
     switch (e.target.getAttribute('data-action')) {
+      // todo: create a "close" action that hides the survey
       case 'prev-step': this.store.dispatch(surveyACtions.setPrevStep()); break;
       case 'next-step': {
-        if (state.step === 4) this.submit(state.steps);
+        // Submit the form when the last step is reached
+        if (state.step === this.maxSteps) this.submit(state.steps);
+        // go to the next step otherwise
         this.store.dispatch(surveyACtions.setNextStep());
         break;
       }
@@ -317,20 +354,25 @@ class Survey {
     }
   }
 
+  // Gets triggered every time a "keyup" or "select" events are triggered
   handleChange(e) {
+    // Check "name" to make sure it's a form element who triggers the action
     if (e.target.name) {
       this.store.dispatch(surveyACtions.validateForm({
         field: e.target.name,
         value: e.target.value,
-        isValid: e.target.validity.valid,
+        isValid: e.target.validity.valid, // HTML5 validation API
       }));
     }
   }
 
+  // Callback when the form is submitted
   handleSubmit(e) {
+    // this is just to prevent submitting the form automatically.
     e.preventDefault();
   }
 
+  // Build the proper object based on the state and submit the results.
   submit(steps) {
     const form = Object.keys(steps)
       // { fields: { ... }, ... }

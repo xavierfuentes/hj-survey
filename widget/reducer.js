@@ -85,15 +85,19 @@ export default function survey(state = getInitialState(), action) {
       newState.steps[state.step].fields[action.payload.field].value = action.payload.value;
       newState.steps[state.step].fields[action.payload.field].isValid = action.payload.isValid;
 
+      // calculate the score of the step based on the field validity
       stepScore = Object.keys(stepFields)
         .map(field => stepFields[field].isValid || false)
         .reduce((score = 0, value) => score + value);
 
+      // calculate the step score needed based on what fields are required
       neededScore = Object.keys(stepFields)
         .filter(field => stepFields[field].required).length;
 
       newState.steps[state.step].isValid = stepScore >= neededScore;
 
+      // we don't re-render after validating
+      // todo: show error messages
       newState.shouldRender = false;
 
       return newState;
@@ -113,6 +117,7 @@ export default function survey(state = getInitialState(), action) {
 
       request.send(JSON.stringify(action.payload.form));
 
+      // Set completed in the state to prevent the survey from being shown again
       return Object.assign({}, state, {
         isCompleted: true,
       });

@@ -1,10 +1,12 @@
 import angular from 'angular';
+import ngMaterialTable from 'angular-material-data-table';
 import surveyListComponent from './survey-list.component';
-import surveyElementModule from '../survey-element';
+
+import 'angular-material-data-table/dist/md-data-table.min.css';
 
 const surveyListModule = angular
   .module('survey.list', [
-    surveyElementModule.name,
+    ngMaterialTable,
   ])
   .component('surveyList', surveyListComponent);
 

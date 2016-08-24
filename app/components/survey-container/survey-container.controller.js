@@ -5,7 +5,21 @@ class SurveyContainer {
   }
 
   $onInit() {
-    this.surveys = this.SurveyService.getSurveys().then(surveys => surveys);
+    this.surveys = [];
+
+    this.SurveyService
+      .getSurveys()
+      .then(surveys => {
+        this.surveys = surveys;
+      });
+  }
+
+  // getSurveys() {
+  //   debugger;
+  // }
+
+  onSuccess(surveys) {
+    this.surveys = surveys;
   }
 }
 
