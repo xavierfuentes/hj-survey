@@ -1,19 +1,15 @@
 const path = require('path');
 const webpack = require('webpack');
 
-module.exports = {
-  devtool: 'inline-source-map',
-  entry: {
-    app: [
-      'webpack-dev-server/client?http://localhost:8080',
-      'webpack/hot/only-dev-server',
-      path.resolve(__dirname, 'app/index.js'),
-    ],
-    widget: [
-      'webpack-dev-server/client?http://localhost:8080',
-      'webpack/hot/only-dev-server',
-      path.resolve(__dirname, 'widget/index.js'),
-    ],
+const env = process.env.WEBPACK_ENV;
+const appEntrypoint = path.resolve(__dirname, 'app/index.js');
+const widgetEntrypoint = path.resolve(__dirname, 'widget/index.js');
+const outputPath = path.join(__dirname, 'dist');
+const baseConfig = {
+  output: {
+    path: outputPath,
+    publicPath: '/',
+    filename: '[name].js',
   },
   module: {
     loaders: [
@@ -24,16 +20,35 @@ module.exports = {
   resolve: {
     extensions: ['', '.js'],
   },
-  output: {
-    path: path.join(__dirname, 'dist'),
-    publicPath: '/',
-    filename: '[name].js',
+};
+const devConfig = Object.assign({}, baseConfig, {
+  devtool: 'inline-source-map',
+  entry: {
+    app: [
+      // 'webpack-dev-server/client?http://localhost:8080',
+      // 'webpack/hot/only-dev-server',
+      appEntrypoint,
+    ],
+    widget: [
+      // 'webpack-dev-server/client?http://localhost:8080',
+      // 'webpack/hot/only-dev-server',
+      widgetEntrypoint,
+    ],
   },
   devServer: {
-    contentBase: path.join(__dirname, 'dist'),
-    hot: true,
+    contentBase: outputPath,
+    // hot: true,
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
   ],
-};
+});
+const buildConfig = Object.assign({}, baseConfig, {
+  entry: { app: appEntrypoint, widget: widgetEntrypoint },
+  plugins: [
+    // new webpack.optimize.UglifyJsPlugin({ minimize: true }),
+  ],
+});
+const webpackConfig = env === 'build' ? buildConfig : devConfig;
+
+module.exports = webpackConfig;
