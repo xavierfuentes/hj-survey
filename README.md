@@ -44,10 +44,19 @@ Technologies used to do this:
 ### Requirements
 
 NodeJS >=6
+MongoDB (installed and running)
 
 ### Getting started
 ```
 git clone https://github.com/xavifuefer/hj-survey.git
 cd hj-survey
 npm install
+
+# Start the server
+npm run dev:server
+
+# Start the client
+npm run dev:client
 ```
+
+Open `http://localhost:8080/customer.html` in your browser to see the fake user and `http://localhost:8080/` to see the admin app.
