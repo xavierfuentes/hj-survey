@@ -12,7 +12,6 @@ const surveyListComponent = {
             <tr md-row>
               <th md-column><span>Name</span></th>
               <th md-column><span>Email</span></th>
-              <th md-column><span>Type</span></th>
               <th md-column><span>Business Name</span></th>
               <th md-column><span>Business Size</span></th>
               <th md-column><span>Address</span></th>
@@ -25,7 +24,6 @@ const surveyListComponent = {
             <tr md-row md-select="survey" md-select-id="name" md-auto-select ng-repeat="survey in $ctrl.surveys">
               <td md-cell>{{survey.name}}</td>
               <td md-cell>{{survey.email}}</td>
-              <td md-cell>{{survey.type}}</td>
               <td md-cell>{{survey['business.name']}}</td>
               <td md-cell>{{survey['business.size']}}</td>
               <td md-cell>{{survey.address}}</td>
