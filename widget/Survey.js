@@ -141,7 +141,7 @@ class Survey {
       #survey-form-${this.id} > #survey-footer-${this.id} > img {
         width: 60%;
         margin-top: 6em;
-        opacity: .2;
+        opacity: .5;
       }`;
     this.store = store;
     this.$el = this.build('div', this.template, `survey-${this.id}`);
@@ -158,11 +158,14 @@ class Survey {
   }
 
   render() {
+    const state = this.store.getState();
     // sets the events up
     this.$el.addEventListener('click', this.handleClick.bind(this));
     this.$el.addEventListener('change', this.handleChange.bind(this));
     this.$el.addEventListener('keyup', this.handleChange.bind(this));
     this.$el.addEventListener('submit', this.handleSubmit.bind(this));
+
+    if (state.isCompleted) return true;
 
     this.update();
 
@@ -279,13 +282,16 @@ class Survey {
     if (state.shouldRender && state.step <= maxSteps) {
       $step.innerHTML = stepTemplates[state.step];
     }
-    if (state.step > maxSteps) $step.innerHTML = null;
+    if (state.step > maxSteps) {
+      $step.innerHTML = null;
+    }
 
     // update footer
-    $prevButton.style.display = state.step === 1 ? 'none' : 'initial';
-    $nextButton.innerText = state.step === maxSteps ? 'Send Results' : 'Next step';
-    if (state.isFinished) {
+    if (state.isCompleted) {
       $footer.innerHTML = '<img src="//davidpottrell.co.uk/blog/wp-content/uploads/2015/10/hotjar-XL.png">';
+    } else {
+      $prevButton.style.display = state.step === 1 ? 'none' : 'initial';
+      $nextButton.innerText = state.step === maxSteps ? 'Send Results' : 'Next step';
     }
   }
 

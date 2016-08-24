@@ -47,6 +47,20 @@
       <div class="main-content">One Fine Content</div>
     </div>
 
-    <script src="./widget.js"></script>
+    <script>
+      (function (x,a,v,i,e,r) {
+        // this is the global object for the Survey class
+        x.hjs = x.hjs || {};
+        // we would set a customerID so we can track the costumer in the BE
+        x._hjsSettings = x._hjsSettings || { customerID: 1, widgetVersion: 1 };
+        // this prevents IE<9 from failing if we use `document.head`
+        e = a.getElementsByTagName('head')[0];
+        // create a script element that will download the Survey app
+        r = a.createElement('script'); e.async = 1;
+        r.src = v + i + x._hjsSettings.customerID;
+        // append everything to the head of the document
+        e.appendChild(r);
+      })(window, document, 'http://localhost:8080/widget.js', '?customerID=');
+    </script>
   </body>
 </html>

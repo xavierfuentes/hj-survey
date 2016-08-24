@@ -115,7 +115,7 @@ export default function survey(state = getInitialState(), action) {
       request.send(JSON.stringify(action.payload.form));
 
       return Object.assign({}, state, {
-        isFinished: true,
+        isCompleted: true,
       });
     }
 
