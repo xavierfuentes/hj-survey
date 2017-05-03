@@ -1,5 +1,7 @@
 # HJ-Survey
 ### Objective
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/xavifuefer/hj-survey.svg)](https://greenkeeper.io/)
 The objective is to set up a simple HTML/CSS multi-step survey pop-up which sends responses back to a database and updates a survey responses admin page.
 
 Technologies used to do this:
